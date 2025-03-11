@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_CARTAS 100  // Define o máximo de cartas que podem ser cadastradas
+#define MAX_CARTAS 100
 
 typedef struct {
     char estado;
@@ -14,7 +14,6 @@ typedef struct {
     int pontosTuristicos;
 } Carta;
 
-// Função para salvar cartas em um arquivo externo
 void salvarCartas(Carta *cartas, int numCartas) {
     FILE *arquivo = fopen("cartas.txt", "w");
     if (arquivo == NULL) {
@@ -22,7 +21,7 @@ void salvarCartas(Carta *cartas, int numCartas) {
         return;
     }
 
-    fprintf(arquivo, "%d\n", numCartas); // Salva o número de cartas
+    fprintf(arquivo, "%d\n", numCartas);
     for (int i = 0; i < numCartas; i++) {
         fprintf(arquivo, "%c %s %s %d %.2f %.2f %d\n",
                 cartas[i].estado, cartas[i].codigo, cartas[i].nomeCidade,
@@ -30,10 +29,8 @@ void salvarCartas(Carta *cartas, int numCartas) {
     }
     
     fclose(arquivo);
-    printf("Cartas salvas com sucesso!\n");
 }
 
-// Função para carregar cartas do arquivo
 int carregarCartas(Carta *cartas) {
     FILE *arquivo = fopen("cartas.txt", "r");
     if (arquivo == NULL) {
@@ -42,7 +39,7 @@ int carregarCartas(Carta *cartas) {
     }
 
     int numCartas;
-    fscanf(arquivo, "%d", &numCartas); // Lê o número de cartas
+    fscanf(arquivo, "%d", &numCartas);
     for (int i = 0; i < numCartas; i++) {
         fscanf(arquivo, " %c %s %49[^\n] %d %f %f %d",
                &cartas[i].estado, cartas[i].codigo, cartas[i].nomeCidade,
@@ -54,40 +51,97 @@ int carregarCartas(Carta *cartas) {
     return numCartas;
 }
 
+void compararCartas(Carta carta1, Carta carta2) {
+    int opcao;
+    printf("\nEscolha o atributo para comparar:\n");
+    printf("1 - População\n");
+    printf("2 - Área\n");
+    printf("3 - PIB\n");
+    printf("4 - Pontos turísticos\n");
+    printf("Escolha uma opção: ");
+    scanf("%d", &opcao);
+
+    switch (opcao) {
+        case 1:
+            printf("\nPopulação:\n");
+            printf("%s: %d vs %s: %d\n", carta1.nomeCidade, carta1.populacao, carta2.nomeCidade, carta2.populacao);
+            if (carta1.populacao > carta2.populacao)
+                printf(">> %s venceu!\n", carta1.nomeCidade);
+            else if (carta1.populacao < carta2.populacao)
+                printf(">> %s venceu!\n", carta2.nomeCidade);
+            else
+                printf(">> Empate!\n");
+            break;
+        case 2:
+            printf("\nÁrea:\n");
+            printf("%s: %.2f km² vs %s: %.2f km²\n", carta1.nomeCidade, carta1.area, carta2.nomeCidade, carta2.area);
+            if (carta1.area > carta2.area)
+                printf(">> %s venceu!\n", carta1.nomeCidade);
+            else if (carta1.area < carta2.area)
+                printf(">> %s venceu!\n", carta2.nomeCidade);
+            else
+                printf(">> Empate!\n");
+            break;
+        case 3:
+            printf("\nPIB:\n");
+            printf("%s: %.2f bi vs %s: %.2f bi\n", carta1.nomeCidade, carta1.pib, carta2.nomeCidade, carta2.pib);
+            if (carta1.pib > carta2.pib)
+                printf(">> %s venceu!\n", carta1.nomeCidade);
+            else if (carta1.pib < carta2.pib)
+                printf(">> %s venceu!\n", carta2.nomeCidade);
+            else
+                printf(">> Empate!\n");
+            break;
+        case 4:
+            printf("\nPontos turísticos:\n");
+            printf("%s: %d vs %s: %d\n", carta1.nomeCidade, carta1.pontosTuristicos, carta2.nomeCidade, carta2.pontosTuristicos);
+            if (carta1.pontosTuristicos > carta2.pontosTuristicos)
+                printf(">> %s venceu!\n", carta1.nomeCidade);
+            else if (carta1.pontosTuristicos < carta2.pontosTuristicos)
+                printf(">> %s venceu!\n", carta2.nomeCidade);
+            else
+                printf(">> Empate!\n");
+            break;
+        default:
+            printf("Opção inválida!\n");
+            break;
+    }
+}
+
 int main() {
-    Carta cartas[MAX_CARTAS]; // Array de cartas
-    int numCartas = carregarCartas(cartas); // Carrega cartas já salvas
+    Carta cartas[MAX_CARTAS];
+    int numCartas = carregarCartas(cartas);
 
     int opcao;
     do {
         printf("\nMenu:\n");
         printf("1 - Cadastrar nova carta\n");
         printf("2 - Listar cartas\n");
-        printf("3 - Salvar e sair\n");
-        printf("Escolha uma opção: ");
+        printf("3 - Comparar cartas\n");
+        printf("4 - Salvar e sair\n");
+        printf("Escolha uma opção: ");
         scanf("%d", &opcao);
-        getchar(); // Limpa o buffer
+        getchar();
 
         if (opcao == 1) {
             if (numCartas < MAX_CARTAS) {
-                printf("\nDigite os dados da carta %d:\n", numCartas + 1);
+                printf("\nDigite os dados da nova carta:\n");
                 printf("Estado (A-H): ");
                 scanf(" %c", &cartas[numCartas].estado);
-                printf("Código (ex: C03): ");
+                printf("Código: ");
                 scanf(" %3s", cartas[numCartas].codigo);
-                printf("Nome da cidade: ");
                 getchar();
+                printf("Nome da cidade: ");
                 fgets(cartas[numCartas].nomeCidade, 50, stdin);
-                strtok(cartas[numCartas].nomeCidade, "\n"); // Remove o \n do final
-                printf("População: ");
+                strtok(cartas[numCartas].nomeCidade, "\n");
+                printf("População: ");
                 scanf("%d", &cartas[numCartas].populacao);
-                printf("Área (km²): ");
+                printf("Área (km²): ");
                 scanf("%f", &cartas[numCartas].area);
-                printf("PIB (bilhões de reais): ");
+                printf("PIB (bilhões): ");
                 scanf("%f", &cartas[numCartas].pib);
-                printf("Número de pontos turísticos: ");
+                printf("Pontos turísticos: ");
                 scanf("%d", &cartas[numCartas].pontosTuristicos);
-
                 numCartas++;
                 printf("Carta cadastrada com sucesso!\n");
             } else {
@@ -96,18 +150,20 @@ int main() {
         } else if (opcao == 2) {
             printf("\nCartas cadastradas:\n");
             for (int i = 0; i < numCartas; i++) {
-                printf("\nCarta %d:\n", i + 1);
-                printf("Estado: %c\n", cartas[i].estado);
-                printf("Código: %s\n", cartas[i].codigo);
-                printf("Nome da Cidade: %s\n", cartas[i].nomeCidade);
-                printf("População: %d\n", cartas[i].populacao);
-                printf("Área: %.2f km²\n", cartas[i].area);
-                printf("PIB: %.2f bilhões de reais\n", cartas[i].pib);
-                printf("Número de Pontos Turísticos: %d\n", cartas[i].pontosTuristicos);
+                printf("%d - %s\n", i + 1, cartas[i].nomeCidade);
+            }
+        } else if (opcao == 3) {
+            int c1, c2;
+            printf("\nEscolha duas cartas para comparar (número):\n");
+            scanf("%d %d", &c1, &c2);
+            if (c1 >= 1 && c1 <= numCartas && c2 >= 1 && c2 <= numCartas && c1 != c2) {
+                compararCartas(cartas[c1 - 1], cartas[c2 - 1]);
+            } else {
+                printf("Cartas inválidas!\n");
             }
         }
-    } while (opcao != 3);
+    } while (opcao != 4);
 
     salvarCartas(cartas, numCartas);
-   return 0;
+    return 0;
 }
